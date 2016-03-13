@@ -1,0 +1,127 @@
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#define N 1005
+
+using namespace std;
+
+struct Node{
+    int index;
+    int value;
+};
+
+vector<Node> ranklist[N];
+
+bool cmp(Node a, Node b)
+{
+    return a.value > b.value;
+}
+
+
+int main(int argc, const char * argv[]) {
+    
+    freopen("/Users/chengfeng/Dev/Algorithm/PAT甲级/PAT-1056-MiceAndRice-25/PAT-1056-MiceAndRice-25/in", "r", stdin);
+    
+    int np, ng;
+    
+    while(cin >> np >> ng)
+    {
+        vector<int> a(np), order(np);
+        
+        vector<Node> b(np);
+        vector<Node> res(np);
+        
+        for(int i = 0; i < np; ++i)
+        {
+            int t;
+            cin >> t;
+            a[i] = t;
+        }
+        
+        for(int i = 0; i < np; ++i)
+        {
+            int t;
+            cin >> t;
+            order[i] = t;
+            b[i].index = t;
+            b[i].value = a[t];
+        }
+        
+        
+        
+        int start = 0;
+        int size = 0;
+        
+        while(b.size() > 0)
+        {
+            if(b.size() == 1)
+            {
+                ranklist[size++].push_back(b[0]);
+                break;
+            }
+            
+            while(start < b.size())
+            {
+                sort(b.begin()+start, b.begin()+start+ng, cmp);
+                
+                start += ng;
+            }
+            
+            start = 0;
+            res.clear();
+            while (start < b.size())
+            {
+                for(int i = start; i < start+ng; ++i)
+                {
+                    if(i % ng == 0)
+                    {
+                        if(i < b.size())
+                            res.push_back(b[start]);
+                    }
+                    else
+                    {
+                        if(i < b.size())
+                            ranklist[size].push_back(b[i]);
+                    }
+                    
+                }
+                
+                start += ng;
+            }
+            
+            b = res;
+            
+            start = 0;
+            size++;
+        }
+        /*
+         for(int i = 0; i < size; ++i)
+         {
+         for(int j = 0; j < ranklist[i].size(); ++j)
+         cout << ranklist[i][j].index << "-" << ranklist[i][j].value << " ";
+         cout << endl;
+         }
+         */
+        int r = 0;
+        int rank[N] = {0};
+        
+        for(int i = size-1; i >= 0; --i)
+        {
+            for(int j = 0; j < ranklist[i].size(); ++j)
+            {
+                int no = ranklist[i][j].index;
+                rank[no] = r+1;
+            }
+            
+            r += ranklist[i].size();
+        }
+        
+        cout << rank[0];
+        for(int i = 1; i < np; ++i)
+            cout << " " << rank[i];
+        
+    }
+    
+    return 0;
+}

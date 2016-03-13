@@ -1,0 +1,113 @@
+
+ 
+
+/*
+
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int go[][3] = {
+    1, 0, 0,
+    -1, 0, 0,
+    0, 1, 0,
+    0, -1, 0,
+    0, 0, 1,
+    0, 0, -1
+};
+
+int m, n, k, t;
+int maze[65][1300][150];
+int volume = 0;
+int totalVolume = 0;
+
+struct Point{
+    int z, x, y;
+    Point(int _z, int _x, int _y):z(_z),x(_x),y(_y){}
+};
+
+void bfs(int p, int i, int j)
+{
+    if(maze[p][i][j] == 0)
+        return;
+    
+    queue<Point> q;
+    q.push(Point(p, i, j));
+    volume++;
+    maze[p][i][j] = 0;
+    
+    while(!q.empty())
+    {
+        Point nowP = q.front();
+        q.pop();
+        
+        
+        for(int i = 0; i < 6; ++i)
+        {
+            int nz = nowP.z + go[i][0];
+            int nx = nowP.x + go[i][1];
+            int ny = nowP.y + go[i][2];
+            
+            
+            if(nx < 0 || ny < 0 || nz < 0 || nx >= m || ny >= n || nz >= k)
+                continue;
+            
+            if(maze[nz][nx][ny] == 0)
+                continue;
+            
+            volume++;
+            
+            q.push(Point(nz, nx, ny));
+            
+            maze[nz][nx][ny] = 0;
+        }
+        
+    }
+}
+
+int main(int argc, const char * argv[]) {
+    
+    freopen("/Users/chengfeng/Dev/Algorithm/PAT甲级/PAT-1091-AcuteStroke-30/PAT-1091-AcuteStroke-30/in", "r", stdin);
+    
+    
+    while(cin >> m >> n >> k >> t)
+    {
+        
+        for(int p = 0; p < k; ++p)
+            for(int i = 0; i < m; ++i)
+                for(int j = 0; j < n; ++j)
+                {
+                    int tmp;
+                    cin >> tmp;
+                    
+                    maze[p][i][j] = tmp;
+                }
+        
+        
+        for(int p = 0; p < k; ++p)
+            for(int i = 0; i < m; ++i)
+                for(int j = 0; j < n; ++j)
+                {
+                    volume = 0;
+                    
+                    bfs(p, i, j);
+                    
+                    //cout << volume << endl;
+                    
+                    
+                    if(volume >= t)
+                        totalVolume += volume;
+                }
+        
+        cout << totalVolume;
+    }
+    
+    
+    
+    
+    return 0;
+}
+
+*/
+ 

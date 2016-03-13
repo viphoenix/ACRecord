@@ -1,0 +1,102 @@
+//
+//  test.cpp
+//  DFS-TempleOfBone
+//
+//  Created by 程锋 on 15/8/16.
+//  Copyright (c) 2015年 程锋. All rights reserved.
+//
+
+#include <iostream>
+
+using namespace std;
+
+char maze[10][10];
+int cnt[10][10];
+bool mark[10][10];
+int N, M, T;
+bool flag = false;
+
+int go[][2] = {
+    -1, 0,
+    0, -1,
+    0, 1,
+    1, 0
+};
+
+
+void DFS(int x, int y)
+{
+    if(maze[x][y] == 'D')
+    {
+        if(cnt[x][y] == T)
+        {
+            flag = true;
+            return;
+        }
+        
+    }
+    
+    for(int k = 0; k < 4; ++k)
+    {
+        int nx = x + go[k][0];
+        int ny = y + go[k][1];
+        
+        if(x < 1 || y < 1 || x > N || y > M)
+            continue;
+        
+        if(mark[nx][ny])
+            continue;
+        
+        if(maze[nx][ny] == 'X')
+            continue;
+        
+        
+        
+        
+        mark[nx][ny] = true;
+        cnt[nx][ny] = cnt[x][y] + 1;
+        DFS(nx, ny);
+        mark[nx][ny] =false;
+        
+        if(flag)
+            return;
+    }
+}
+
+
+int main(int argc, const char * argv[]) {
+    
+    //freopen("/Users/chengfeng/Dev/Algorithm/DFS-TempleOfBone/DFS-TempleOfBone/in", "r", stdin);
+    
+    while (cin >> N >> M >> T && N != 0) {
+        //initalize
+        for(int i = 1; i <= N; ++i)
+            for(int j = 1; j <= M; ++j)
+            {
+                cnt[i][j] = 0;
+                mark[i][j] = false;
+            }
+        
+        for(int i = 1; i <= N; ++i)
+            for(int j = 1; j <= M; ++j)
+            {
+                char tmp;
+                cin >> tmp;
+                maze[i][j] = tmp;
+            }
+        
+        for(int i = 1; i <= N; ++i)
+            for(int j = 1; j <= M; ++j)
+            {
+                if(maze[i][j] == 'S')
+                {
+                    mark[i][j] = true;
+                    DFS(i, j);
+                }
+            }
+        
+        cout << (flag?"YES":"NO") << endl;
+    }
+    
+    return 0;
+}

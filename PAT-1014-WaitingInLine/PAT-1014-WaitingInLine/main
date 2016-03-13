@@ -1,0 +1,151 @@
+//
+//  main.cpp
+//  PAT-1014-WaitingInLine
+//
+//  Created by 程锋 on 15/8/22.
+//  Copyright (c) 2015年 程锋. All rights reserved.
+//
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+struct Node{
+    int no;
+    int t;
+};
+
+vector<Node> windows[21];
+
+int main(int argc, const char * argv[]) {
+    
+    freopen("/Users/chengfeng/Dev/Algorithm/PAT甲级/PAT-1014-WaitingInLine/PAT-1014-WaitingInLine/in", "r", stdin);
+    
+    int n, m, k, q;
+    
+    while(cin >> n >> m >> k >> q && n != 0)
+    {
+        //initialize
+        for(int i = 1; i <= n; ++i)
+            if(!windows[i].empty())
+                windows[i].clear();
+        
+        int * needTime = (int *) malloc(sizeof(int) * (k+1));
+        //每个人完成所需要的时间
+        int * doneTime = (int *) malloc(sizeof(int) * (k+1));
+        //每个窗口已经业务处理的时间
+        int * windowTime = (int *) malloc(sizeof(int) * (n+1));
+        int * query = (int *) malloc(sizeof(int) * (q+1));
+        
+        for(int i = 1; i <= n; ++i)
+            windowTime[i] = 0;
+        
+        for(int i = 1; i <= k; ++i)
+        {
+            int tmp;
+            cin >> tmp;
+            needTime[i] = tmp;
+        }
+        
+        for(int i = 1; i <= q; ++i)
+        {
+            int tmp;
+            cin >> tmp;
+            query[i] = tmp;
+        }
+        
+        for(int i = 1; i <= k; ++i)
+        {
+            //窗口里的总人数
+            int sum = 0;
+            //最大值
+            int maxSize = 0x7fffffff;
+            //人数最少的窗口编号
+            int key;
+            
+            for(int j = 1; j <= n; ++j)
+            {
+                if(windows[j].size() < maxSize)
+                {
+                    maxSize = (int)windows[j].size();
+                    key = j;
+                }
+                
+                sum += windows[j].size();
+                
+            }
+            
+            if(sum < n * m)
+            {
+                Node tmp;
+                tmp.no = i;
+                tmp.t = needTime[i];
+                
+                windows[key].push_back(tmp);
+            }
+            
+            if(sum == n * m)
+            {
+                int maxSize = 0x7fffffff;
+                int pos;
+                
+                Node tmp;
+                for(int j = 1; j <= n; ++j)
+                    if(windows[j][0].t < maxSize)
+                    {
+                        maxSize = windows[j][0].t;
+                        pos = j;
+                        tmp.no = windows[j][0].no;
+                        tmp.t = windows[j][0].t;
+                    }
+                
+                doneTime[tmp.no] = windowTime[pos] + tmp.t;
+                windowTime[pos] = doneTime[tmp.no];
+                cout << windowTime[pos] << " ";
+                //删除一个所需时间最少的一个任务
+                
+                windows[pos].erase(windows[pos].begin(), windows[pos].begin() + 1);
+                //每删除一个任务，所有窗口的执行时间增加, 每个窗口的第一个任务时间减少
+                
+                for(int i = 1; i <= n; ++i)
+                {
+                    windowTime[i] += tmp.t;
+                    if(i != pos)
+                        windows[i][0].t -= tmp.t;
+                }
+                /*
+                 for(int i = 1; i <= n; ++i)
+                 cout << windowTime[i] << " ";
+                 cout << endl;
+                 */
+                
+                //添加一个新任务
+                tmp.no = i;
+                tmp.t = needTime[i];
+                windows[pos].push_back(tmp);
+            }
+            
+        }
+        /*
+         cout << endl;
+         for(int i = 1; i <= k; ++i)
+         cout << needTime[i] << " ";
+         
+         cout << endl;
+         
+         for(int i = 1; i <= k; ++i)
+         cout << doneTime[i] << " ";
+         
+         */
+        free(needTime);
+        free(doneTime);
+        free(windowTime);
+        free(query);
+        
+    }
+    
+    
+    return 0;
+}
+

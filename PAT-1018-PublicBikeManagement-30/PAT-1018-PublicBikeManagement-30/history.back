@@ -1,0 +1,161 @@
+#include <iostream>
+#include <vector>
+#define N 505
+#define INF 0x7fffffff
+
+using namespace std;
+
+int dist[N];
+int remain[N]; //在保证路径上所有状态为perfect的情况下，富余的自行车数
+bool mark[N];
+int pre[N];
+
+struct Node{
+    int next;
+    int time;
+    int nums;
+};
+
+vector<Node> node[N];
+int station[N] = {0};
+
+void print(int dest)
+{
+    if(dest == 0)
+    {
+        printf("0");
+        return;
+    }
+    
+    print(pre[dest]);
+    
+    printf("->%d", dest);
+    
+}
+
+int main(int argc, const char * argv[]) {
+    
+    freopen("/Users/chengfeng/Dev/Algorithm/PAT甲级/PAT-1018-PublicBikeManagement-30/PAT-1018-PublicBikeManagement-30/in", "r", stdin);
+    
+    int capacity, n, destination, roads;
+    
+    while(scanf("%d%d%d%d", &capacity, &n, &destination, &roads) != EOF)
+    {
+        
+        for(int i = 1; i <= n; ++i)
+        {
+            scanf("%d", &station[i]);
+            
+            mark[i] = false;
+            remain[i] = -INF;
+            dist[i] = -1;
+            pre[i] = -1;
+        }
+        
+        for(int i = 0; i < roads; ++i)
+        {
+            int a, b, t;
+            scanf("%d%d%d", &a, &b, &t);
+            
+            Node tmp;
+            tmp.next = b;
+            tmp.time = t;
+            tmp.nums = station[b];
+            node[a].push_back(tmp);
+            
+            tmp.next = a;
+            tmp.nums = station[a];
+            node[b].push_back(tmp);
+        }
+        
+        int start = 0;
+        mark[start] = true;
+        dist[start] = 0;
+        remain[start] = 0;
+        
+        
+        //int need = capacity/2 - station[destination];
+        
+        for(int i = 1; i <= n; ++i)  //注意次数不要漏
+        {
+            for(int j = 0; j < (int)node[start].size(); ++j)
+            {
+                int newNode = node[start][j].next;
+                int time = node[start][j].time;
+                int nums = node[start][j].nums;
+                
+                if(mark[newNode])
+                    continue;
+                
+                if(dist[newNode] == -1 || dist[newNode] > dist[start] + time)
+                {
+                    dist[newNode] = dist[start] + time;
+                    remain[newNode] = remain[start] + nums - capacity/2;
+                    
+                    pre[newNode] = start;
+                }
+                else if(dist[newNode] == dist[start] + time)
+                {
+                    if(remain[newNode] >= 0)   //是大于0，不是大于需要的数量，remain表示达到perfect状态后，剩余的数量
+                    {
+                        if(remain[newNode] > remain[start] + nums - capacity/2 && remain[start] + nums - capacity/2 >= 0)  //注意要大于0
+                        {
+                            remain[newNode] = remain[start] + nums - capacity/2;
+                            pre[newNode] = start;
+                        }
+                    }
+                    else
+                    {
+                        if(remain[newNode] < remain[start] + nums - capacity/2)
+                        {
+                            remain[newNode] = remain[start] + nums - capacity/2;
+                            pre[newNode] = start;
+                        }
+                    }
+                    
+                }
+            }
+            
+            int min = INF;
+            for(int i = 0; i < n; ++i)
+            {
+                if(dist[i] == -1 || mark[i])
+                    continue;
+                
+                if(dist[i] < min)
+                {
+                    min = dist[i];
+                    start = i;
+                }
+            }
+            
+            mark[start] = true;
+        }
+        
+        /*
+         for(int i = 1; i <= n; ++i)
+         printf("%d ", remain[i]);
+         printf("\n");
+         */
+        
+        if(remain[destination] < 0 && remain[destination] != -INF)
+        {
+            printf("%d ", remain[destination]*(-1));
+            
+            print(destination);
+            
+            printf(" 0");
+        }
+        else
+        {
+            printf("0 ");
+            print(destination);
+            printf(" %d", remain[destination]);
+        }
+        
+    }
+    
+    
+    
+    return 0;
+}

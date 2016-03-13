@@ -1,0 +1,139 @@
+//未考虑一辆车进出多次的情况，配对算法值得回顾
+
+#include <iostream>
+#include <stdio.h>
+#include <cstring>
+#include <algorithm>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+struct Node{
+    char number[10];
+    char time[15];
+    char status[10];
+    
+    
+}node[10005];
+
+
+bool cmp1 (const Node & a, const Node & b)
+{
+    if(strcmp(a.number, b.number) != 0)
+        return strcmp(a.number, b.number) < 0;
+    
+    return strcmp(a.status, b.status) < 0;
+}
+
+bool cmp2 (const Node & a, const Node & b)
+{
+    if(strcmp(a.status, b.status) != 0)
+        return strcmp(a.status, b.status) > 0;
+    
+    return strcmp(a.time, b.time) < 0;
+}
+
+char query[15];
+
+vector<Node> paired;
+
+int main(int argc, const char * argv[]) {
+    
+    freopen("/Users/chengfeng/Dev/Algorithm/PAT甲级/PAT-1095-CarsOnCampus-30/PAT-1095-CarsOnCampus-30/in", "r", stdin);
+    
+    int n, k;
+    
+    while(scanf("%d%d", &n, &k) != EOF)
+    {
+        while(!paired.empty())
+            paired.clear();
+        
+        for(int i = 1; i <= n; ++i)
+            scanf("%s%s%s", node[i].number, node[i].time, node[i].status);
+        
+        sort(node+1, node+n+1, cmp1);
+        
+        
+        for(int i = 1; i <= n; ++i)
+            printf("%s %s %s\n", node[i].number, node[i].time, node[i].status);
+        
+        
+        char cmpNumber[10] = " "; // 表示上一次配对成功的number
+        //strcpy(cmpNumber, node[1].number);
+        
+        for(int i = 2; i <= n; ++i)
+        {
+            if(strcmp(node[i].status, "in") == 0)
+                continue;
+            
+            //状态为out,并且前面已经配对成功，判断当前结点的number，是否和已配对的相同
+            if(strcmp(node[i].number, cmpNumber) == 0)
+                continue;
+            
+            if(strcmp(node[i].number, node[i-1].number) == 0 && strcmp(node[i-1].status, "in") == 0)
+            {
+                strcpy(cmpNumber, node[1].number);
+                paired.push_back(node[i-1]);    //保存所有配对成功的in时间
+                paired.push_back(node[i]);      //保存所有配对成功的out时间
+                continue;
+            }
+            
+        }
+        //sort(paired.begin(), paired.end(), cmp2);
+        printf("\n");
+        for(int i = 0; i < (int)paired.size(); ++i)
+            printf("%s %s %s\n", paired[i].number, paired[i].time, paired[i].status);
+        
+        
+        
+        
+        while(k--)
+        {
+            scanf("%s", query);
+            
+            int cnt = 0;
+            
+            for(int i = 0; i < paired.size(); i += 2)
+            {
+                if(strcmp(paired[i].time, query) > 0 || strcmp(paired[i+1].time, query) < 0)
+                    continue;
+                
+                cnt++;
+            }
+            
+            printf("%d\n", cnt);
+        }
+        
+        char maxTime[10] = "0";
+        
+        for(int i = 1; i < paired.size(); i += 2)
+        {
+            int s = (paired[i].time[7] - '0') + (paired[i].time[6] - '0') * 10 - ((paired[i-1].time[7] - '0') + (paired[i-1].time[6] - '0') * 10);
+            int m = (paired[i].time[4] - '0') + (paired[i].time[3] - '0') * 10 - ((paired[i-1].time[4] - '0') + (paired[i-1].time[3] - '0') * 10);
+            int h = (paired[i].time[1] - '0') + (paired[i].time[0] - '0') * 10 - ((paired[i-1].time[1] - '0') + (paired[i-1].time[0] - '0') * 10);
+            
+            if(s < 0)
+            {
+                s += 60;
+                m -= 1;
+            }
+            
+            if(m < 0)
+            {
+                m += 60;
+                h -= 1;
+            }
+            
+            cout <<  setfill('0')<< setw(2) <<h <<":" << m <<":" << s << endl;
+            char interval[10];
+            sprintf(interval, "%02d:%02d:%02d", h, m, s);
+            
+            //cout << interval;
+            
+        }
+        
+    }
+    
+    return 0;
+}

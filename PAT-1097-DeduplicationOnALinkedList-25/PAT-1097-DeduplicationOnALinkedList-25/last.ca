@@ -1,0 +1,164 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100005
+
+typedef struct Node{
+    int address;
+    int key;
+    int flag;
+    int next;
+}Node;
+
+int n;
+
+Node node[MAX];
+
+//结点指针数组
+Node deleteNode[MAX];
+int deleteSize = 0;
+int count[10005];
+
+int cmp(const void * a, const void * b)
+{
+    Node * left = (Node *)a;
+    Node * right = (Node *)b;
+    
+    return left->address - right->address;
+    
+}
+
+int cmp2(const void * a, const void * b)
+{
+    Node * left = (Node *)a;
+    Node * right = (Node *)b;
+    
+    return left->next - right->next;
+    
+}
+
+
+int abs(int x)
+{
+    return x > 0 ? x : -x;
+}
+
+Node * findByAddress(int address, int low, int high)
+{
+    //int mid = -1;
+    
+    while(low <= high)
+    {
+        int mid = (low + high) / 2;
+        
+        if(node[mid].address == address)
+            return & node[mid];
+        
+        if(node[mid].address > address)
+            high = mid - 1;
+        else
+            low = mid + 1;
+    }
+    
+    return NULL;
+    
+}
+
+Node * findByNext(int next, int low, int high)
+{
+    //int mid = -1;
+    
+    while(low <= high)
+    {
+        int mid = (low + high) / 2;
+        
+        if(node[mid].next == next)
+            return & node[mid];
+        
+        if(node[mid].next > next)
+            high = mid - 1;
+        else
+            low = mid + 1;
+    }
+    
+    return NULL;
+    
+}
+
+
+int main(int argc, const char * argv[]) {
+    
+    freopen("/Users/chengfeng/Dev/Algorithm/PAT甲级/PAT-1097-DeduplicationOnALinkedList-25/PAT-1097-DeduplicationOnALinkedList-25/in", "r", stdin);
+    
+    int address, start;
+    
+    while(scanf("%d%d", &address, &n) != EOF)
+    {
+        for(int i = 0; i < 10005; ++i)
+            count[i] = -1; //保留一个元素
+        for(int i = 0; i < n; ++i)
+        {
+            scanf("%d%d%d", &node[i].address, &node[i].key, &node[i].next);
+            count[abs(node[i].key)]++;
+            
+            if(node[i].next == -1)
+                start = i;
+        }
+        
+        qsort(node, n, sizeof(Node), cmp2);
+        
+        Node *  p = findByNext(-1, 0, n-1);
+        //Node * q = NULL;
+        //逆序遍历
+        
+        while(p->address != address)
+        {
+            //一定要先保存下一个结点，否则更新next后，找不到下一个元素
+            Node * nextNode = findByNext(p->address, 0, n-1);
+            
+            if(count[abs(p->key)] > 0)
+            {
+                
+                //删除元素，并且更新链接，相当于双链表
+                //Node * nextNode = findByNext(p->address, 0, n-1);  必须先保存
+                nextNode->next = p->next;
+                
+                
+                //删除元素和保持元素位置不能对调
+                if(deleteSize == 0)
+                    p->next = -1;    //第一个删除的元素，即为删除链表最后一个元素
+                else
+                    p->next = deleteNode[deleteSize-1].address; //将删除元素链接起来
+                deleteNode[deleteSize++] = *p;
+                count[abs(p->key)]--;
+                
+            }
+            
+            p = nextNode;
+        }
+        
+        
+        qsort(node, n, sizeof(Node), cmp);
+        Node * front = findByAddress(address, 0, n-1);
+        while(front->next != -1)
+        {
+            printf("%05d %d %05d\n", front->address, front->key, front->next);
+            front = findByAddress(front->next, 0, n-1);
+        }
+        
+        printf("%05d %d %d\n", front->address, front->key, front->next);
+        
+        for(int i = deleteSize-1; i >= 0; --i)
+        {
+            if(deleteNode[i].next != -1)
+                printf("%05d %d %05d\n", deleteNode[i].address, deleteNode[i].key, deleteNode[i].next);
+            else
+                printf("%05d %d %d\n", deleteNode[i].address, deleteNode[i].key, deleteNode[i].next);
+        }
+        
+        
+    }
+    
+    return 0;
+}
+

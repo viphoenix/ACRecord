@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define N 100005
+
+int cnt[N];
+int stack[N];
+int top = -1;
+int n;
+int curNums = 0;
+
+int getMedian()
+{
+    int size = 0;
+    for(int i = 1; i < N; ++i)
+    {
+        int num = cnt[i];
+        if(num == 0)
+            continue;
+        while(num--)
+        {
+            size++;
+            if(size == (curNums-1)/2 + 1)
+                return i;
+        }
+    }
+    
+    return 0;
+}
+
+int main(int argc, const char * argv[]) {
+    
+    freopen("/Users/chengfeng/Dev/Algorithm/PAT甲级/PAT-1057-Stack-30/PAT-1057-Stack-30/in", "r", stdin);
+    
+    while(scanf("%d", &n) != EOF)
+    {
+        for(int i = 0; i < N; ++i)
+        {
+            cnt[i] = 0;
+        }
+        
+        getchar();
+        
+        while(n--)
+        {
+            char command[20];
+            gets(command);  //有空格，使用gets
+            
+            if(strcmp(command, "Pop") == 0)
+            {
+                if(top != -1)
+                {
+                    printf("%d\n", stack[top]);
+                    
+                    cnt[stack[top--]]--;
+                    curNums--;
+                }
+                else
+                {
+                    printf("Invalid\n");
+                    continue;
+                }
+            }
+            else if (strcmp(command, "PeekMedian") == 0)
+            {
+                if(top == -1)
+                {
+                    printf("Invalid\n");
+                    continue;
+                }
+                
+                printf("%d\n", getMedian());
+                
+            }
+            else if(strncmp(command, "Push", 4) == 0)
+            {
+                int key = 0;
+                int w = 1;
+                for(int i = (int)strlen(command)-1; command[i] != ' '; --i)
+                {
+                    key += (command[i] - '0') * w;
+                    w *= 10;
+                }
+                
+                cnt[key]++;
+                stack[++top] = key;
+                
+                curNums++;
+            }
+            else
+            {
+                printf("Invalid\n");
+                continue;
+            }
+        }
+    }
+    
+    
+    
+    return 0;
+}
